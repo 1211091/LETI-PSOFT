@@ -1,0 +1,39 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Get plan's details Sequence Diagram
+
+autoactivate on
+autonumber
+
+actor "User" as User
+participant ":SubscriptionController" as Ctrl
+participant ":Helper" as Helper
+participant ":repo:UserRepository" as userRepo
+participant "user:User" as usr
+participant "service:SubscriptionService" as ServiceSubscription
+participant "repo:SubscriptionRepository" as SubRepo
+participant "repo:PlanRepository" as PlanRepo
+participant ":mapper:PlanMapper" as planMapper
+
+activate User
+
+User -> Ctrl: GET/api/subscriptions/planDetails
+Ctrl -> Helper: getUserByToken(request)
+Helper --> Ctrl: userId
+Ctrl -> userRepo: findById(userId)
+userRepo --> Ctrl: user
+Ctrl -> usr**: getAuthorities()
+alt if(user.role = "SUBSCRIBER")
+    Ctrl -> ServiceSubscription: getPlanDetails(userId)
+    ServiceSubscription -> SubRepo: findByUserId(userId)
+    SubRepo --> ServiceSubscription: subscription
+    ServiceSubscription -> PlanRepo: findByPlanName(subscription.getPlanName())
+    PlanRepo --> ServiceSubscription: plan
+    ServiceSubscription --> Ctrl: plan
+    Ctrl -> planMapper: toPlanDTO(plan)
+    planMapper --> Ctrl: planDTO
+end
+Ctrl --> User: 200 ok
+
+@enduml

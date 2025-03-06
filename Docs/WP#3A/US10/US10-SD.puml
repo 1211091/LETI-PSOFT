@@ -1,0 +1,39 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Get new subscriptions and cancellations in a specific month Sequence Diagram
+
+autoactivate on
+autonumber
+
+actor "User" as User
+participant ":SubscriptionController" as Ctrl
+participant ":Helper" as Helper
+participant ":repo:UserRepository" as userRepo
+participant "user:User" as usr
+participant "service:SubscriptionService" as ServiceSubscription
+participant "repo:SubscriptionRepository" as SubscriptionRepo
+
+activate User
+
+User -> Ctrl: POST/dashboard/subsandcancellations
+Ctrl -> Helper: getUserByToken(request)
+Helper --> Ctrl: userId
+Ctrl -> userRepo: findById(userId)
+userRepo --> Ctrl: user
+Ctrl -> usr**: getAuthorities()
+alt if(user.role = "PRODUCT_MANAGER")
+    Ctrl -> ServiceSubscription: countNewSubscriptionsByMonth(resource.getMonth())
+    ServiceSubscription -> SubscriptionRepo: countNewSubscriptionsByMonth(month)
+    SubscriptionRepo --> ServiceSubscription: newCount
+    ServiceSubscription --> Ctrl: newCount
+    Ctrl -> Ctrl: counts.put(newCount)
+    Ctrl -> ServiceSubscription: countCancelledSubscriptionsByMonth(resource.getMonth())
+    ServiceSubscription -> SubscriptionRepo: countCancelledSubscriptionsByMonth(month)
+    SubscriptionRepo --> ServiceSubscription: cancelledCount
+    ServiceSubscription --> Ctrl: cancelledCount
+    Ctrl -> Ctrl: counts.put(cancelledCount)
+end
+Ctrl --> User: 201 CREATED
+
+@enduml

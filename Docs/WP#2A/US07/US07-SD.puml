@@ -1,0 +1,47 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Subscribe to a plan Sequence Diagram
+
+autoactivate on
+autonumber
+
+actor "User" as User
+participant ":SubscriptionController" as Ctrl
+participant ":Helper" as Helper
+participant ":repo:UserRepository" as userRepo
+participant "user:User" as usr
+participant "service:SubscriptionService" as ServiceSubscription
+participant "repo:PlanRepository" as PlanRepo
+participant "repo:SubscriptionRepository" as SubRepo
+participant "mapper:EditSubscriptionMapper" as EditSubMapper
+participant "subscription:Subscription" as Subscription
+participant "mapper:SubscriptionMapper" as SubMapper
+
+activate User
+
+User -> Ctrl: POST/api/subscriptions/create
+Ctrl -> Helper: getUserByToken(request)
+Helper --> Ctrl: userId
+Ctrl -> Ctrl: resource.setUserId(userId)
+Ctrl -> userRepo: findById(userId)
+userRepo --> Ctrl: user
+Ctrl -> usr**: getAuthorities()
+alt if(user.role = "NEW_COSTUMER")
+    Ctrl -> usr: addAuthority("SUBSCRIBER")
+    Ctrl -> ServiceSubscription: createSubscription(resource)
+    ServiceSubscription -> EditSubMapper: create(resource)
+    ServiceSubscription -> PlanRepo: findByPlanName(resource.getPlanName())
+    PlanRepo --> ServiceSubscription: plan
+    ServiceSubscription -> Subscription**: setSubscriptionDate(date)
+    ServiceSubscription -> Subscription: setQuoteOfTheDay()
+    ServiceSubscription -> SubRepo: save(subscription)
+    SubRepo --> ServiceSubscription: subscription
+    ServiceSubscription --> Ctrl: subscription
+    Ctrl -> SubMapper: toSubscriptionDTO(subscription)
+    SubMapper --> Ctrl: subscriptionDTO
+end
+
+Ctrl --> User: 201 Created
+
+@enduml

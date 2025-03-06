@@ -1,0 +1,59 @@
+@startuml
+!pragma layout smetana
+'https://plantuml.com/class-diagram
+
+skinparam classAttributeIconSize 0
+hide circle
+hide methods
+
+title Domain Model
+
+class Plan {
+    - planName: String
+    - numberOfMinutes: String
+    - planDescription: String
+    - maxUsers: int
+    - musicCollections: int
+    - musicSuggestions: String
+    - monthlyFee: double
+    - annualFee: double
+    - isActive: bool
+    - isPromoted: bool
+    - isArchived: bool
+}
+
+class Subscription {
+    - subscriptionId: Long
+    - planName: String
+    - devices: List<Device>
+    - currentDevices: int
+    - subscriptionDate: LocalDate
+    - cancellationDate: LocalDate
+    - lastRenovationDate: LocalDate
+    - isActive: bool
+    - isSubscription: bool
+    - currentDevices: int
+    - paymentFrequency: String
+    - userId: Long
+}
+
+class User {
+    - userId: Long
+    - userName: String
+    - password: String
+    - fullName: String
+}
+
+class Device {
+    - macAddress: String
+    - designation: String
+    - image: Image
+}
+
+class Roles{}
+
+Subscription "0..*" -> "1" Plan: has
+Subscription "1" -left-> "0..*" Device: has
+Subscription "1" -down-> "1" User: has
+User "1..*" -right-> "1" Roles: has
+@enduml

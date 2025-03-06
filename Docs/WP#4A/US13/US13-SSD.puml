@@ -1,0 +1,17 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Add device to subscription System Sequence Diagram
+
+autoactivate on
+autonumber
+
+actor "User" as User
+participant ":RestAPI" as System
+
+activate User
+
+User -> System: PUT/devices/:macAddr
+System --> User: 200 OK
+
+@enduml

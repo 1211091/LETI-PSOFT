@@ -1,0 +1,745 @@
+{
+	"info": {
+		"_postman_id": "d5819a9a-6293-4499-af94-244badb8f76d",
+		"name": "PSOFT",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23606137",
+		"_collection_link": "https://winter-moon-961937.postman.co/workspace/PSOFT_PROJECT_G7~7e599079-3176-4073-84f9-a5d31415e946/collection/26550504-d5819a9a-6293-4499-af94-244badb8f76d?action=share&creator=23606137&source=collection_link"
+	},
+	"item": [
+		{
+			"name": "PSOFT_PROJECT_G7",
+			"item": [
+				{
+					"name": "Plan",
+					"item": [
+						{
+							"name": "Define or edit a plan",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\"numberOfMinutes\": \"55000\",\r\n\"planDescription\": \"bom\",\r\n\"maxUsers\": 3,\r\n\"musicCollections\": 2,\r\n\"musicSuggestions\": \"automatic\",\r\n\"monthlyFee\": 3.99, \r\n\"annualFee\": 50.99,\r\n\"isActive\": true,\r\n\"isPromoted\": false\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/plans/plan12",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"plans",
+										"plan12"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Plans",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/plans/all",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"plans",
+										"all"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update plan",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\"numberOfMinutes\": \"500\",\r\n\"planDescription\": \"meh\",\r\n\"maxUsers\": 4,\r\n\"musicCollections\": 2,\r\n\"musicSuggestions\": \"automatic\",\r\n\"monthlyFee\": 3.99, \r\n\"annualFee\": 50.99,\r\n\"isActive\": true,\r\n\"isPromoted\": false\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/plans/:planName",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"plans",
+										":planName"
+									],
+									"variable": [
+										{
+											"key": "planName",
+											"value": "plan3"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Specific Plan",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/plans/Gold/specific",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"plans",
+										"Gold",
+										"specific"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Deactivate Plan",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/plans/:planName/deactivate",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"plans",
+										":planName",
+										"deactivate"
+									],
+									"variable": [
+										{
+											"key": "planName",
+											"value": "Gold"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Subscription",
+					"item": [
+						{
+							"name": "Create Subscription",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"planName\": \"Gold\",\r\n    \"paymentFrequency\": \"Annually\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/subscriptions",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"subscriptions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Edit Subscription",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"planName\": \"Gold\",\r\n    \"paymentFrequency\": \"Annually\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/subscriptions/:subscriptionId/update",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"subscriptions",
+										":subscriptionId",
+										"update"
+									],
+									"variable": [
+										{
+											"key": "subscriptionId",
+											"value": "6"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Subscriptions",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/subscriptions/all",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"subscriptions",
+										"all"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Specific subscription",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/subscriptions/1/specific",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"subscriptions",
+										"1",
+										"specific"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Plan's Details",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/subscriptions/:subscriptionId/plans",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"subscriptions",
+										":subscriptionId",
+										"plans"
+									],
+									"variable": [
+										{
+											"key": "subscriptionId",
+											"value": "35"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Cancel a subscription",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/subscriptions/5",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"subscriptions",
+										"5"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "New Subscriptions and Cancellations in a specific month",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"month\": \r\n    }\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/subscriptions/dashboard",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"subscriptions",
+										"dashboard"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Reactivate subscription",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/subscriptions/:subscriptionId/reactivate",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"subscriptions",
+										":subscriptionId",
+										"reactivate"
+									],
+									"variable": [
+										{
+											"key": "subscriptionId",
+											"value": "10"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Devices",
+					"item": [
+						{
+							"name": "Add device",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"subscriptionId\": 1,\n    \"designation\": \"DeviceDesignation\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/devices/:macAddress",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"devices",
+										":macAddress"
+									],
+									"variable": [
+										{
+											"key": "macAddress",
+											"value": "11:22:11:22:C3:FF"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Device",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/devices/:macAddress/delete",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"devices",
+										":macAddress",
+										"delete"
+									],
+									"variable": [
+										{
+											"key": "macAddress",
+											"value": "00:11:22:33:44:55:66:99"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get all devices",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/devices/all",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"devices",
+										"all"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Devices from a specific subscription",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/devices/:subscriptionId",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"devices",
+										":subscriptionId"
+									],
+									"variable": [
+										{
+											"key": "subscriptionId",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Authz",
+					"item": [
+						{
+							"name": "Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Authtenticates\", function(){\r",
+											"\r",
+											"    pm.response.to.have.status(200);\r",
+											"\r",
+											"    let token = postman.getResponseHeader(\"Authorization\");\r",
+											"    pm.environment.set(\"token\", token);    \r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\":\"bar@email.com\",\r\n    \"password\":\"bar123\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/public/login",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Login (user admin)",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Authtenticates\", function(){\r",
+											"\r",
+											"    pm.response.to.have.status(200);\r",
+											"\r",
+											"    let token = postman.getResponseHeader(\"Authorization\");\r",
+											"    pm.environment.set(\"tokenUserAdmin\", token);    \r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\":\"u1@mail.com\",\r\n    \"password\":\"Password1\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/public/login",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Register",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"username\":\"bar@email.com\",\r\n    \"fullName\":\"Mary Bar\",\r\n    \"password\":\"bar123\",\r\n    \"rePassword\":\"bar123\",\r\n    \"authorities\":[\"FOO_ADMIN\"]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/public/register",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"public",
+										"register"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "docs",
+					"item": [
+						{
+							"name": "OpenAPI",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api-docs/",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api-docs",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Swagger UI",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/swagger-ui",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"swagger-ui"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "user",
+					"item": [
+						{
+							"name": "Search user by username",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"query\":{\r\n        \"username\":\"u1@mail.com\"\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/user/search",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"user",
+										"search"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search user by username or fullname",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"page\":{\r\n        \"number\":\"1\",\r\n        \"limit\":\"10\"\r\n    },\r\n    \"query\":{\r\n        \"username\":\"mary1@mail.com\",\r\n        \"fullName\":\"Two\"\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/user/search",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"user",
+										"search"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search all page 1",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"page\":{\r\n        \"number\":\"1\",\r\n        \"limit\":\"5\"\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/user/search",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"user",
+										"search"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Search all page 2",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"page\":{\r\n        \"number\":\"2\",\r\n        \"limit\":\"5\"\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/user/search",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"user",
+										"search"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Roles",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}{{baseUrl}}/user/roles",
+									"host": [
+										"{{host}}{{baseUrl}}"
+									],
+									"path": [
+										"user",
+										"roles"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}

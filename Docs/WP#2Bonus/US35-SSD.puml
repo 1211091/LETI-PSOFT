@@ -1,0 +1,16 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Augment subscription's profile with a joke System Sequence Diagram
+
+autoactivate on
+autonumber
+
+actor "User" as User
+participant ":RestAPI" as System
+
+activate User
+
+User -> System: GET/api/subscriptions/jokes
+System --> User: 200 Ok
+@enduml

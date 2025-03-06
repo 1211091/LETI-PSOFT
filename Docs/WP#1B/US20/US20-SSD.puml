@@ -1,0 +1,19 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Promote a Plan System Sequence Diagram
+
+autoactivate on
+autonumber
+
+actor "User" as User
+participant ":RestAPI" as System
+
+activate User
+
+User -> System: PUT/api/plans/:planName/promote
+System --> User: 200 Ok
+
+
+
+@enduml

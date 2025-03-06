@@ -1,0 +1,38 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title List Devices from a specific subscription Sequence Diagram
+
+autoactivate on
+autonumber
+
+actor "User" as User
+participant ":DeviceController" as Ctrl
+participant ":Helper" as Helper
+participant ":repo:UserRepository" as userRepo
+participant "user:User" as usr
+participant "subscriptionService:SubscriptionService" as Svc
+participant "subscriptionRepo:SubscriptionRepository" as subRepo
+participant "deviceRepo:DeviceRepository" as devRepo
+participant "mapper:DeviceMapper" as devMapper
+
+
+activate User
+
+
+User -> Ctrl: GET/api/devices/user
+Ctrl -> Helper: getUserByToken(request)
+Helper --> Ctrl: userId
+Ctrl -> userRepo: findById(userId)
+userRepo --> Ctrl: user
+Ctrl -> usr**: getAuthorities()
+alt if(user.role = "SUBSCRIBER")
+    Ctrl -> Svc: findDevSubs(userId)
+    Svc -> devRepo: findByUserId(subscriptionId)
+    devRepo --> Svc: devices
+    Svc --> Ctrl: devices
+end
+Ctrl --> User: 200 Ok
+
+
+@enduml

@@ -1,0 +1,19 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Define a Plan System Sequence Diagram
+
+autoactivate on
+autonumber
+
+actor "User" as User
+participant ":RestAPI" as System
+
+activate User
+
+User -> System: PATCH/api/plan/:planName/archive
+System --> User: 200 OK
+
+
+
+@enduml

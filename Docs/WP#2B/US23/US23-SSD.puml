@@ -1,0 +1,16 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Renew annual Subscription System Sequence Diagram
+
+autoactivate on
+autonumber
+
+actor "User" as User
+participant ":RestAPI" as System
+
+activate User
+
+User -> System: PATCH/api/subscriptions/renew
+System --> User: 200 Ok
+@enduml

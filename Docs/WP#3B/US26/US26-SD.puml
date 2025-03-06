@@ -1,0 +1,141 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Get Revenue Sequence Diagram
+
+autoactivate on
+
+actor "User" as User
+participant ":DashboardController" as Ctrl
+participant ":Helper" as Helper
+participant ":UserRepository" as userRepo
+participant "user:User" as user
+participant ":DashboardService" as Svc
+participant ":PlanRepository" as planRepo
+participant ":SubscriptionRepository" as subRepo
+participant ":RevenueMapper" as mapper
+participant ":RevenueDTO" as dto
+participant ":RevenueObj" as revenue
+
+
+activate User
+
+
+
+User -> Ctrl: GET /api/dashboard/revenue?plan
+Ctrl -> Helper: getUserByToken(request)
+Helper --> Ctrl: userId
+Ctrl -> userRepo: findById(userId)
+userRepo --> Ctrl: user
+Ctrl -> user**: getAuthorities()
+
+alt if(user.role = "PRODUCT_MANAGER" or "FINANCIAL_DIRECTOR")
+    Ctrl -> Svc: calculateRevenue(planFilter)
+    alt if planFilter exists
+    Svc -> planRepo: find(plan)
+    planRepo --> Svc: filteredPlan
+    else
+    Svc -> planRepo: findAll()
+    planRepo --> Svc: plans
+    end if
+
+    Svc -> columns**
+    Svc -> rows**
+    Svc -> columns: add("Plan", "Metric", "Total")
+    columns --> Svc
+    deactivate columns
+
+    group foreach plan
+        Svc -> subRepo: findByPlanName(plan.getPlanName)
+        subRepo --> Svc: subscriptions
+
+        Svc -> Svc: activeSubscriptions = 0
+        deactivate
+
+        group foreach subscription
+                alt if subscription.isActive()
+                Svc -> Svc: activeSubscriptions++
+                deactivate
+                end if
+        end
+
+        Svc -> Svc: newSubscriptions = 0
+        deactivate
+
+        group foreach subscription
+                alt if subscription.isActive() AND subscription.subscriptionDate is from the last 30 days
+                Svc -> Svc: newSubscriptions++
+                deactivate
+                end if
+        end
+
+        Svc -> Svc: cancellations = 0
+        deactivate
+
+        group foreach subscription
+                alt if !subscription.isActive() AND subscription.cancellationDate is from the last 30 days
+                Svc -> Svc: cancellations++
+                deactivate
+                end if
+        end
+
+
+        Svc -> Svc: churnRate = cancellations / activeSubscriptions * 100
+        deactivate
+
+        Svc -> Svc: revenue = 0
+        deactivate
+
+        group foreach subscription
+            alt if subscription.subscriptionDate is from this year
+                Svc -> Svc: revenue += subscription.paymentFee
+                deactivate
+            end if
+        end
+
+        Svc -> Metrics**
+        SVc -> Metrics: add(activeSubscriptions, newSubscriptions, cancellations, churnRate, revenue)
+        Metrics --> Svc: metrics
+
+        Svc -> rows: addRow(plan.name, metrics)
+        rows --> Svc
+    end
+
+    Svc -> Svc: totalActiveSubscriptions = 0
+            deactivate
+            Svc -> Svc: totalNewSubscriptions = 0
+            deactivate
+            Svc -> Svc: totalCancellations = 0
+            deactivate
+            Svc -> Svc: totalChurnRate = 0
+            deactivate
+            Svc -> Svc: totalRevenue = 0
+            deactivate
+
+            group foreach row
+                Svc -> Svc: totalActiveSubscriptions += row.getMetric().getActiveSubscriptions()
+                deactivate
+                Svc -> Svc: totalNewSubscriptions += row.getMetric().getNewSubscriptions()
+                deactivate
+                Svc -> Svc: totalCancellations += row.getMetric().getCancellations()
+                deactivate
+                Svc -> Svc: totalChurnRate += row.getMetric().getChurnRate()
+                deactivate
+                Svc -> Svc: totalRevenue += row.getMetric().getRevenue()
+                deactivate
+            end
+
+            SVc -> Metrics: add(totalActiveSubscriptions, totalNewSubscriptions, totalCancellations, totalChurnRate, totalRevenue)
+            Metrics --> Svc: metrics
+
+            Svc -> rows: addRow("TOTAL" metrics)
+            rows --> Svc
+
+    Svc -> mapper: toRevenueDTO(columns, rows)
+    mapper --> Svc: revenueDTO
+    Svc --> Ctrl: revenueDTO
+end
+Ctrl --> User: 200 Ok
+
+
+@enduml

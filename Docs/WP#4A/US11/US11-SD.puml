@@ -1,0 +1,51 @@
+@startuml
+title Create Device Sequence Diagram
+
+autoactivate on
+
+actor "User" as User
+participant ":DeviceController" as Ctrl
+participant ":Helper" as Helper
+participant ":repo:UserRepository" as userRepo
+participant "user:User" as usr
+participant "deviceService:DeviceService" as Svc
+participant "subscriptionRepo:SubscriptionRepository" as subRepo
+participant "device:Device" as device
+participant "subscription:Subscription" as subscription
+participant "deviceRepo:DeviceRepository" as devRepo
+
+activate User
+
+User -> Ctrl: PUT/api/devices/:macAddress
+Ctrl -> Helper: getUserByToken(request)
+Helper --> Ctrl: userId
+Ctrl -> userRepo: findById(userId)
+userRepo --> Ctrl: user
+Ctrl -> usr**: getAuthorities()
+group alt if (user.role == "SUBSCRIBER")
+    group alt if (ifMatchValue == null || ifMatchValue.isEmpty())
+        Ctrl -> Svc: createDevice(macAddress, resource)
+        Svc -> subRepo: findById(userId)
+        subRepo --> Svc: subscription
+
+        Svc -> device**: create(macAddress, userId, resource)
+        Svc -> subscription: getDevices()
+        subscription --> Svc: devices
+        Svc -> subscription: devices.add(device)
+        subscription --> Svc
+        Svc -> subscription: setDevices(devices)
+        subscription --> Svc
+        Svc -> subscription: setCurrentDevices()
+        subscription -> subscription: currrentDevices++
+        subscription --> Svc
+        deactivate subscription
+        Svc -> subRepo: save(subscription)
+        subRepo --> Svc: ok
+        Svc -> devRepo: save(device)
+        devRepo --> Svc: ok
+        Svc --> Ctrl: device
+        end
+    end
+Ctrl --> User: 201 Created
+
+@enduml

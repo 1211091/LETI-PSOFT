@@ -1,0 +1,16 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title  Get new subscriptions and cancellations System Sequence Diagram
+
+autoactivate on
+autonumber
+
+actor "User" as User
+participant ":RestAPI" as System
+
+activate User
+
+User -> System: POST/dashboard/subsandcancellations
+System --> User: 201 CREATED
+@enduml

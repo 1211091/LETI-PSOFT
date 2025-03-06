@@ -1,0 +1,16 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title  Get cashflow from past/upcoming n months
+
+autoactivate on
+autonumber
+
+actor "User" as User
+participant ":RestAPI" as System
+
+activate User
+
+User -> System: GET /api/dashboard/cashflow?timeline&months&plan
+System --> User: 200 ok
+@enduml

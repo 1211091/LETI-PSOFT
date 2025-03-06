@@ -1,0 +1,33 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Get plan's price history Sequence Diagram
+
+autoactivate on
+autonumber
+actor "User" as User
+participant ":PlanController" as Ctrl
+participant ":Helper" as Helper
+participant ":repo:UserRepository" as userRepo
+participant "user:User" as usr
+participant "planService:PlanService" as Svc
+participant "repository:PriceHistoryRepository" as priceRepo
+
+activate User
+
+User -> Ctrl: GET/api/plans/{planName}
+Ctrl -> Helper: getUserByToken(request)
+Helper --> Ctrl: userId
+Ctrl -> userRepo: findById(userId)
+userRepo --> Ctrl: user
+Ctrl -> usr**: getAuthorities()
+alt if(user.role = "MARKETING_DIRECTOR")
+    Ctrl -> Svc: getPriceHistory(planName)
+    Svc -> priceRepo: findByPlanNameOrderByLastPriceChangeDateDesc(planName)
+    priceRepo --> Svc: pricesList
+    deactivate
+    Svc --> Ctrl: ok
+end
+Ctrl --> User: 200 OK
+
+@enduml

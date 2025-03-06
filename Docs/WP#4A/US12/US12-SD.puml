@@ -1,0 +1,51 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Remove Device from Subscription Sequence Diagram
+
+autoactivate on
+
+actor "User" as User
+participant ":DeviceController" as Ctrl
+participant ":Helper" as Helper
+participant ":repo:UserRepository" as userRepo
+participant "user:User" as usr
+participant "deviceService:DeviceService" as Svc
+participant "deviceRepo:DeviceRepository" as devRepo
+participant "subscriptionRepo:SubscriptionRepository" as subRepo
+participant "device:Device" as device
+participant "subscription:Subscription" as subscription
+
+
+activate User
+
+
+User -> Ctrl: DELETE/api/devices/:macAddr/delete
+Ctrl -> Helper: getUserByToken(request)
+Helper --> Ctrl: userId
+Ctrl -> userRepo: findById(userId)
+userRepo --> Ctrl: user
+Ctrl -> usr**: getAuthorities()
+group alt if (user.role == "SUBSCRIBER")
+    Ctrl -> Svc: deleteById(macAddr)
+    Svc -> devRepo: findById(macAddr)
+    devRepo --> Svc: device
+    Svc -> subRepo: findById(userId)
+    subRepo --> Svc: subscription
+    Svc -> subscription: getDevices()
+    subscription --> Svc: devices
+    Svc -> subscription: devices.remove(device)
+    subscription --> Svc
+    Svc -> subscription: setCurrentDevices()
+    subscription -> subscription: currentDevices--
+    subscription --> Svc
+    deactivate subscription
+    Svc -> subRepo: save(subscription)
+    subRepo --> Svc: ok
+    Svc -> devRepo: deleteByMacAddress(macAddr)
+    devRepo --> Svc: ok
+    Svc --> Ctrl: success
+end
+Ctrl --> User: 204 No Content
+
+@enduml

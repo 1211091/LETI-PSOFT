@@ -1,0 +1,17 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Remove device from subscription System Sequence Diagram
+
+autoactivate on
+autonumber
+
+actor "User" as User
+participant ":RestAPI" as System
+
+activate User
+
+User -> System: DELETE/api/devices/:macAddr/delete
+System --> User: 204 No Content
+
+@enduml

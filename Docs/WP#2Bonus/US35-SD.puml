@@ -1,0 +1,55 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Augment subscription's profile with a joke Sequence Diagram
+
+autoactivate on
+autonumber
+
+actor "User" as User
+participant ":SubscriptionController" as Ctrl
+participant ":Helper" as Helper
+participant ":repo:UserRepository" as userRepo
+participant "user:User" as usr
+participant "service:SubscriptionService" as ServiceSubscription
+participant "repo:SubscriptionRepository" as SubRepo
+participant "utils:Utils" as Utils
+participant "subscription:Subscription" as Subscription
+
+activate User
+
+User -> Ctrl: GET/api/subscriptions/jokes
+Ctrl -> Helper: getUserByToken(request)
+Helper --> Ctrl: userId
+Ctrl -> userRepo: findById(userId)
+userRepo --> Ctrl: user
+Ctrl -> usr**: getAuthorities()
+alt if(user.role = "SUBSCRIBER")
+    Ctrl -> ServiceSubscription: getJoke(userId)
+    ServiceSubscription -> SubRepo: findByUserId(userId)
+    SubRepo --> ServiceSubscription: subscription
+    ServiceSubscription -> Utils: sendGETJoke()
+    Utils -> Utils: obj.openConnection()
+    deactivate
+    Utils -> Utils: con.setRequestMethod("GET")
+    deactivate
+    Utils -> Utils: con.setRequestProperty("X-RapidAPI-Key", key_joke)
+    deactivate
+    Utils -> Utils: con.setRequestProperty("X-RapidAPI-Host", key_host)
+    deactivate
+    Utils -> Utils: con.getResponseCode()
+    deactivate
+    alt if(responseCode == HttpURLConnection.HTTP_OK)
+        Utils -> Utils: con.getInputStream()
+        deactivate
+        Utils -> Utils: response.append(inputLine)
+        deactivate
+        Utils --> ServiceSubscription: json.toString()
+    end
+    ServiceSubscription -> subscription**: subscription.setJoke(json.toString())
+    ServiceSubscription -> SubRepo: save(subscription)
+    ServiceSubscription --> Ctrl: json.toString()
+end
+Ctrl --> User: 200 Ok
+
+@enduml

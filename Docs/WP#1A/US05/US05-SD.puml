@@ -1,0 +1,40 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Update plan´s details Sequence Diagram
+
+autoactivate on
+autonumber
+
+actor "User" as User
+participant ":PlanController" as Ctrl
+participant ":Helper" as Helper
+participant ":repo:UserRepository" as userRepo
+participant "user:User" as usr
+participant "planService:PlanService" as Svc
+participant "PlanMapper:PlanMapper" as Mapper
+participant "plan:Plan" as plan
+participant "repository:PlanRepository" as planRepo
+
+activate User
+
+User -> Ctrl: PATCH/api/plans/:planName
+Ctrl -> Helper: getUserByToken(request)
+Helper --> Ctrl: userId
+Ctrl -> userRepo: findById(userId)
+userRepo --> Ctrl: user
+Ctrl -> usr**: getAuthorities()
+alt if(user.role = "MARKETING_DIRECTOR")
+    Ctrl -> Svc: update(planName, resource)
+    Svc -> planRepo:findByPlanName(planName)
+    planRepo --> Svc: plan
+    Svc -> plan**: update(numberOfMinutes,planDescription,maxUsers,musicCollections,musicSuggestions,isActive,isPromoted, isArchive)
+    Svc -> planRepo: save(plan)
+    planRepo --> Svc: plan
+    Svc --> Ctrl : plan
+    Ctrl -> Mapper: toPlanDTO(plan)
+    Mapper --> Ctrl: planDTO
+end
+Ctrl --> User: 200 OK
+
+@enduml

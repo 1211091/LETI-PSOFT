@@ -1,0 +1,57 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Update plan´s price details Sequence Diagram
+
+autoactivate on
+autonumber
+actor "User" as User
+participant ":PlanController" as Ctrl
+participant ":Helper" as Helper
+participant "repo:UserRepository" as userRepo
+participant "user:User" as usr
+participant "planService:PlanService" as Svc
+participant "planMapper:PlanMapper" as Mapper
+participant "plan:Plan" as plan
+participant "repository:PlanRepository" as planRepo
+participant "priceHistory:PriceHistory" as plan
+participant "priceRepository:PriceHistoryRepository" as priceRepo
+
+activate User
+
+User -> Ctrl: PATCH/api/plans/updatePrice
+Ctrl -> Helper: getUserByToken(request)
+Helper --> Ctrl: userId
+Ctrl -> userRepo: findById(userId)
+userRepo --> Ctrl: user
+Ctrl -> usr**: getAuthorities()
+alt if(user.role = "MARKETING_DIRECTOR")
+    Ctrl -> Svc: updatePrice(planName, resource, userName)
+    Svc -> planRepo: findByPlanName(planName)
+    planRepo --> Svc: plan
+    Svc->priceHistory**: setPreviousAnnualFee(plan.getAnnualFee()
+    Svc->priceHistory:setPreviousMonthlyFee(plan.getMonthlyFee())
+    deactivate
+    Svc->priceHistory:setCurrentMonthlyFee(resource.getMonthlyFee())
+    deactivate
+    Svc->priceHistory:setCurrentAnnualFee(resource.getAnnualFee())
+    deactivate
+    Svc->priceHistory:setLastPriceChangeDate(LocalDate.now())
+    deactivate
+    Svc->priceHistory:setUsername(userName)
+    deactivate
+    Svc->priceHistory:setPlanName(plan.getPlanName())
+    deactivate
+    Svc -> priceRepo: save(priceHistory)
+    deactivate
+    priceRepo --> Svc: ok
+    deactivate
+    Svc -> plan**: applyPrice(monthlyFee,annualFee)
+
+    Svc -> planRepo: save(plan)
+    planRepo --> Svc: ok
+    Svc --> Ctrl: ok
+end
+Ctrl --> User: 200 OK
+
+@enduml

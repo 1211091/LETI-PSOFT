@@ -1,0 +1,29 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Create user account Sequence Diagram
+
+autoactivate on
+autonumber
+
+actor "User" as User
+participant ":UserApi" as Ctrl
+participant "service:UserService" as UserService
+participant "mapper:UserMapper" as UserMapper
+participant "User:User" as userProfile
+participant "repo:UserRepository" as UserRepo
+
+activate User
+
+User -> Ctrl: POST/public/login
+Ctrl -> UserService: create(request)
+UserService -> UserMapper: create(request)
+UserMapper --> UserService: userDTO
+UserService -> userProfile**: setPassword(request.getPassword())
+UserService -> userProfile: create(userDTO)
+UserService -> UserRepo: save(user)
+UserRepo --> UserService: ok
+UserService --> Ctrl: ok
+Ctrl --> User: 201 Created
+
+@enduml

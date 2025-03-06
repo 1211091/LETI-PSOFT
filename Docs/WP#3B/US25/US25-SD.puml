@@ -1,0 +1,145 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Get Future Cash Flows Sequence Diagram
+
+autoactivate on
+
+actor "User" as User
+participant ":DashboardController" as Ctrl
+participant ":Helper" as Helper
+participant ":UserRepository" as userRepo
+participant "user:User" as user
+participant ":DashboardService" as Svc
+participant ":PlanRepository" as planRepo
+participant ":SubscriptionRepository" as subRepo
+participant ":CashFlowMapper" as mapper
+participant ":CashFlowDTO" as dto
+
+activate User
+
+
+
+User -> Ctrl: GET /api/dashboard/cashflow?timeline&months&plan
+Ctrl -> Helper: getUserByToken(request)
+Helper --> Ctrl: userId
+Ctrl -> userRepo: findById(userId)
+userRepo --> Ctrl: user
+Ctrl -> user**: getAuthorities()
+
+alt if(user.role = "PRODUCT_MANAGER" or "FINANCIAL_DIRECTOR")
+    Ctrl -> Svc: calculateCashFlow(timeline, months, planFilter)
+    Svc -> planRepo: findAll()
+    planRepo --> Svc: plans
+    Svc -> columns**
+    Svc -> rows**
+    Svc -> columns: add("Plans")
+    columns --> Svc
+    deactivate columns
+    group for (i = 1; i <= months; i++)
+        alt if timeline == future
+                Svc -> columns: add(currentMonth + i)
+                columns --> Svc
+            else timeline == past
+                Svc -> columns: add(currentMonth - i)
+                columns --> Svc
+        end if
+    end
+
+    alt if planFilter != null && !planFilter.isEmpty()
+        Svc -> Svc: planFound = false
+        deactivate
+        group alt for each plan
+            alt if plan.getPlanName() == planFilter
+            Svc -> Svc: planFound = true;
+            deactivate
+            Svc --> row**
+            Svc -> row: add plan.getPlanName()
+            row --> Svc
+            group alt for (int i = 1; i <= months; i++)
+                Svc -> Svc: calculateCashFlowForMonth(planName, i, timeline)
+
+                Svc -> Svc: activeMonthlySubs = 0
+                deactivate
+                Svc -> Svc: activeAnnualSubs = 0
+                deactivate
+
+                Svc -> subRepo: findByPlanName(planName)
+                subRepo --> Svc
+
+                alt if timeline == future
+                    group alt for each subscription
+                        alt if subscription.isActive() OR (subscription.isActive() AND subscription.cancelDate.month == month))
+                            alt if subscription.paymentFrequency == Monthly
+                                Svc -> Svc: activeMonthlySubs++
+                                deactivate
+                            else subscription.paymentFrequency == Annualy
+                                alt if subscription.subscriptionDate + 1 year is after currentDate + month
+                                    Svc -> Svc: activeAnnualSubs++
+                                    deactivate
+                                end if
+                            end if
+                        end if
+                    end alt
+                else timeline == past
+                    group alt for each subscription
+                            alt if subscription.paymentFrequency == Monthly
+                                alt if (subscription.subscriptionDate is before currentDate - month AND subscription.cancelDate is null)
+                                    Svc -> Svc: activeMonthlySubs++
+                                    deactivate
+                                end if
+                            else subscription.paymentFrequency == Annualy
+                                alt if subscription.subscriptionDate + 1 year is before currentDate - month
+                                    Svc -> Svc: activeAnnualSubs++
+                                    deactivate
+                                end if
+                            end if
+                    end alt
+                end if
+
+            end alt
+            end if
+
+            Svc -> planRepo: findByPlanName(planName)
+            planRepo --> Svc: plan
+
+            Svc --> Svc: (activeMonthlySubs * plan.MonthlyFee) + (activeAnnualSubs * plan.AnnualFee/12))
+
+            Svc -> rows: add(row)
+            rows --> Svc
+        end
+    end if
+
+    group alt for each plan
+        Svc --> row**
+        Svc -> row: add(planName)
+        row --> Svc
+
+        Svc -> Svc: calculateCashFlowForMonth(planName, i, timeline);
+        Svc --> Svc: (activeMonthlySubs * plan.MonthlyFee) + (activeAnnualSubs * plan.AnnualFee/12))
+        Svc -> rows: add(row)
+        rows --> Svc
+    end alt
+
+    Svc -> totalCashFlow**
+    Svc -> totalCashFlow: add("Total")
+    totalCashFlow --> Svc
+    group alt for (column = 1; column <= months; column++)
+    Svc -> Svc: sum = 0
+    deactivate
+    group alt for (row = 0; row < rows.size(); row++)
+    Svc -> Svc: sum += rows.get(row).get(column)
+    deactivate
+    end alt
+    Svc -> rows: add(totalCashFlow)
+    rows --> Svc
+    end alt
+
+    Svc -> mapper: toCashFlowDTO(columns, rows)
+    mapper --> Svc: cashFlowDTO
+    Svc --> Ctrl: cashFlowDTO
+end
+Ctrl --> User: 200 Ok
+
+
+@enduml

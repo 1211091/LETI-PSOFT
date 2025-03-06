@@ -1,0 +1,41 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+title Cancel a Subscription Sequence Diagram
+
+autoactivate on
+autonumber
+
+actor "User" as User
+participant ":SubscriptionController" as Ctrl
+participant ":Helper" as Helper
+participant ":repo:UserRepository" as userRepo
+participant "user:User" as usr
+participant "service:SubscriptionService" as ServiceSubscription
+participant "repo:SubscriptionRepository" as SubRepo
+participant "subscription:Subscription" as sub
+participant ":mapper: SubscriptionMapper" as subMapper
+
+activate User
+
+User -> Ctrl: PUT/api/subscriptions/cancel
+Ctrl -> Helper: getUserByToken(request)
+Helper --> Ctrl: userId
+Ctrl -> userRepo: findById(userId)
+userRepo --> Ctrl: user
+Ctrl -> usr**: getAuthorities()
+alt if(user.role = "SUBSCRIBER")
+    Ctrl -> ServiceSubscription: cancel(userId)
+    ServiceSubscription -> SubRepo: findByUserId(userId)
+    SubRepo --> ServiceSubscription: subscription
+    ServiceSubscription -> sub**: setCancellationDate()
+    ServiceSubscription -> sub: setActive(false)
+    ServiceSubscription -> SubRepo: save(subscription)
+    SubRepo --> ServiceSubscription: subscription
+    ServiceSubscription --> Ctrl: subscription
+    Ctrl -> subMapper: toSubscriptionDTO(subscription)
+    subMapper --> Ctrl: subscriptionDTO
+end
+Ctrl --> User: 200 Ok
+
+@enduml
